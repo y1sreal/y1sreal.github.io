@@ -2,12 +2,12 @@
 <html>
     <script src='https://d3js.org/d3.v5.min.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js" integrity="sha512-iBAeBWWWFb8HqSBcrqcz98iIpuVH1la39dEYHtyQ/pGpeCQTQVvLJOWAuhv2Q7JSHp9k7hWA7sGxU3hHJe+tFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <style> circle.circleGas {fill: lightblue; stroke: black;} </style>
-    <style> circle.circleElec {fill: orange; stroke: black;} </style>
-    <style> #tooltip {opacity:0;position;absolute;text-align:center;width:60px;height:40px;background:white;border:0px;}</style>
+    <style> circle.circleGas {fill: lightgreen; stroke: black;} </style>
+
+    <style> #tooltip {opacity:0;position:absolute;text-align:center;width:100px;height:100px;background:white;border:1px;}</style>
     <body onload='init()'>
         <p>
-            <a href="index.html">Scene 1</a>   <a href="page2.html">Scene 2</a>   <a href="page3.html">Scene 3</a>
+            <a href="index.html">Engine Cylinders</a>   <a href="page2.html">Fuel</a>   <a href="page3.html">Make</a>  
         </p>
         <svg width=1000 height=1000>
         </svg>
@@ -21,15 +21,16 @@
             var x = d3.scaleLog().base(10).domain([10,150]).range([0,900]);
             var y = d3.scaleLog().base(10).domain([10,150]).range([900,0]);
             var tooltip = d3.select('#tooltip');
+
             d3.select('svg')
             .append('g')
             .attr('transform', 'translate(50,50)')
             .selectAll('circle').data(data).enter().append('circle')
-            .attr('class', function (d,i){if (data[i]['Fuel'] == 'Gasoline'){return 'circleGas'} else {return 'circleElec'}})
+            .attr('class', 'circleGas')
             .attr('cx', function (d,i){return x(data[i]['AverageCityMPG']);})
             .attr('cy', function (d,i){return y(data[i]['AverageHighwayMPG']);})
             .attr('r', function (d,i) {return 2+parseInt(data[i]['EngineCylinders']);})
-            .on('mouseover', function (d,i) {tooltip.style('opacity', 1).style('left', (d3.event.pageX)+'px').style('top',(d3.event.pageY)+'px').html('Item #'+i+' is '+d)})
+            .on('mouseover', function (d,i) {tooltip.style('opacity', 1).style('left', (d3.event.pageX)+'px').style('top',(d3.event.pageY)+'px').html('Make: '+d['Make'] + ', Fuel: '+d['Fuel'] + ', Engine cylinders: ' + d['EngineCylinders'])})
             .on('mouseout', function(){tooltip.style('opacity', 0)});
 
             d3.select('svg').append('g')
@@ -55,17 +56,14 @@ d3.select('svg').append("text")
     .attr("transform", "rotate(-90)")
     .text("Average Highway MPG on a log10 scale");
 
-d3.select('svg').append("circle").attr('class', 'circleGas').attr("cx",100).attr("cy",100).attr("r", 6)
-d3.select('svg').append("circle").attr('class', 'circleElec').attr("cx",100).attr("cy",130).attr("r", 6)
-d3.select('svg').append("text").attr("x", 120).attr("y", 100).text("Gasoline Vehicle").style("font-size", "15px").attr("alignment-baseline","middle")
-d3.select('svg').append("text").attr("x", 120).attr("y", 130).text("Electric Vehicle").style("font-size", "15px").attr("alignment-baseline","middle")
+
 
 
 // Features of the annotation
 const annotations = [
   {
     note: {
-      label: "Gasoline vehicles are clustered on the bottom left of the graph as they are less fuel than elctric vehicles"
+      label: "Vehicles with the highest number of engine cylinders have the lowest fuel efficiency"
     },
     x: 200,
     y: 750,
@@ -83,7 +81,7 @@ const annotations = [
   },
   {
     note: {
-      label: "Exclusively electric vehicles appear on the upper right of the graph due to high fuel efficiency"
+      label: "Vehicles with no engine cylinder (electric) have the highest fuel efficiency"
     },
     x: 800,
     y: 250,

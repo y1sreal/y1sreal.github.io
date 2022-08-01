@@ -1,37 +1,157 @@
 <!DOCTYPE html>
 <html>
     <script src='https://d3js.org/d3.v5.min.js'></script>
-    <style> circle {fill: lightblue; stroke: black;} </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js" integrity="sha512-iBAeBWWWFb8HqSBcrqcz98iIpuVH1la39dEYHtyQ/pGpeCQTQVvLJOWAuhv2Q7JSHp9k7hWA7sGxU3hHJe+tFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style> circle.circleAudi {fill: red; stroke: black;} </style>
+    <style> circle.circleBMW {fill: orange; stroke: black;} </style>
+    <style> circle.circleCadillac {fill: lightyellow; stroke: black;} </style>
+<style> circle.circleChevrolet {fill: lightgreen; stroke: black;} </style>
+<style> circle.circleFord {fill: green; stroke: black;} </style>
+<style> circle.circleJeep {fill: blue; stroke: black;} </style>
+<style> circle.circleMercedes {fill: brown; stroke: black;} </style>
+<style> circle.circleNissan {fill: purple; stroke: black;} </style>
+<style> circle.circleOthers {fill: lightblue; stroke: black;} </style>
+
+    <style> #tooltip {opacity:0;position:absolute;text-align:center;width:100px;height:100px;background:white;border:1px;}</style>
     <body onload='init()'>
         <p>
-            <a href="index.html">Scene 1</a>   <a href="page2.html">Scene 2</a>   <a href="page3.html">Scene 3</a>
+            <a href="index.html">Engine Cylinders</a>   <a href="page2.html">Fuel</a>   <a href="page3.html">Make</a>
         </p>
-        <svg width=300 height=300>
+        <svg width=1000 height=1000>
         </svg>
+        <div id='tooltip'></div>
+
         <script>
 
         async function init() {
-            const data = await d3.csv('https://flunky.github.io/cars2017.csv');
-            var x = d3.scaleLog().base(10).domain([10,150]).range([0,200]);
-            var y = d3.scaleLog().base(10).domain([10,150]).range([200,0]);
+
+ const data = await d3.csv('https://flunky.github.io/cars2017.csv');
+            var x = d3.scaleLog().base(10).domain([10,150]).range([0,900]);
+            var y = d3.scaleLog().base(10).domain([10,150]).range([900,0]);
+            var tooltip = d3.select('#tooltip');
+
+
 
             d3.select('svg')
             .append('g')
             .attr('transform', 'translate(50,50)')
             .selectAll('circle').data(data).enter().append('circle')
+            .attr('class', function (d,i){
+if (data[i]['Make'] == 'Audi'){return 'circleAudi'} 
+else if(data[i]['Make'] =='BMW') {return 'circleBMW'} 
+else if(data[i]['Make'] =='Cadillac') {return 'circleCadillac'} 
+else if(data[i]['Make'] =='Chevrolet') {return 'circleChevrolet'} 
+else if(data[i]['Make'] =='Ford') {return 'circleFord'} 
+else if(data[i]['Make'] =='Jeep') {return 'circleJeep'} 
+else if(data[i]['Make'] =='Mercedes-Benz') {return 'circleMercedes'} 
+else if(data[i]['Make'] =='Nissan') {return 'circleNissan'} 
+else {return 'circleOthers '} 
+})
             .attr('cx', function (d,i){return x(data[i]['AverageCityMPG']);})
             .attr('cy', function (d,i){return y(data[i]['AverageHighwayMPG']);})
-            .attr('r', function (d,i) {return 2+parseInt(data[i]['EngineCylinders']);});
+            .attr('r', function (d,i) {return 2+parseInt(data[i]['EngineCylinders']);})
+            .on('mouseover', function (d,i) {tooltip.style('opacity', 1).style('left', (d3.event.pageX)+'px').style('top',(d3.event.pageY)+'px').html('Make: '+d['Make'] + ', Fuel: '+d['Fuel'] + ', Engine cylinders: ' + d['EngineCylinders'])})
+            .on('mouseout', function(){tooltip.style('opacity', 0)});
 
             d3.select('svg').append('g')
             .attr('transform','translate(50,50)')
-            .call(d3.axisLeft(y).tickValues([10,20,50,100]).tickFormat(d3.format('~s')));
+            .call(d3.axisLeft(y).tickValues([10,20,30,40,50,60,70,80,90,100]).tickFormat(d3.format('~s')));
 
             d3.select('svg').append('g')
-            .attr('transform','translate(50,250)')
-            .call(d3.axisBottom(x).tickValues([10,20,50,100]).tickFormat(d3.format('~s')));
+            .attr('transform','translate(50,950)')
+            .call(d3.axisBottom(x).tickValues([10,20,30,40,50,60,70,80,90,100]).tickFormat(d3.format('~s')));
+
+d3.select('svg').append("text")
+    .attr("class", "x label")
+    .attr("text-anchor", "end")
+    .attr("x", 1000)
+    .attr("y", 1000- 6)
+    .text("Average City MPG on a log10 scale");
+
+d3.select('svg').append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", 6)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90)")
+    .text("Average Highway MPG on a log10 scale");
+
+
+
+d3.select('svg').append("circle").attr('class', 'circleAudi').attr("cx",100).attr("cy",100).attr("r", 6)
+d3.select('svg').append("circle").attr('class', 'circleBMW').attr("cx",100).attr("cy",120).attr("r", 6)
+d3.select('svg').append("circle").attr('class', 'circleCadillac').attr("cx",100).attr("cy",140).attr("r", 6)
+d3.select('svg').append("circle").attr('class', 'circleChevrolet').attr("cx",100).attr("cy",160).attr("r", 6)
+d3.select('svg').append("circle").attr('class', 'circleFord').attr("cx",100).attr("cy",180).attr("r", 6)
+d3.select('svg').append("circle").attr('class', 'circleJeep').attr("cx",100).attr("cy",200).attr("r", 6)
+d3.select('svg').append("circle").attr('class', 'circleMercedes').attr("cx",100).attr("cy",220).attr("r", 6)
+d3.select('svg').append("circle").attr('class', 'circleNissan').attr("cx",100).attr("cy",240).attr("r", 6)
+d3.select('svg').append("circle").attr('class', 'circleOthers').attr("cx",100).attr("cy",260).attr("r", 6)
+
+d3.select('svg').append("text").attr("x", 120).attr("y", 100).text("Audi").style("font-size", "15px").attr("alignment-baseline","middle")
+d3.select('svg').append("text").attr("x", 120).attr("y", 120).text("BMW").style("font-size", "15px").attr("alignment-baseline","middle")
+d3.select('svg').append("text").attr("x", 120).attr("y", 140).text("Cadillac").style("font-size", "15px").attr("alignment-baseline","middle")
+d3.select('svg').append("text").attr("x", 120).attr("y", 160).text("Chevrolet").style("font-size", "15px").attr("alignment-baseline","middle")
+d3.select('svg').append("text").attr("x", 120).attr("y", 180).text("Ford").style("font-size", "15px").attr("alignment-baseline","middle")
+d3.select('svg').append("text").attr("x", 120).attr("y", 200).text("Jeep").style("font-size", "15px").attr("alignment-baseline","middle")
+d3.select('svg').append("text").attr("x", 120).attr("y", 220).text("Mercedes-Benz").style("font-size", "15px").attr("alignment-baseline","middle")
+d3.select('svg').append("text").attr("x", 120).attr("y", 240).text("Nissan").style("font-size", "15px").attr("alignment-baseline","middle")
+d3.select('svg').append("text").attr("x", 120).attr("y", 260).text("Others").style("font-size", "15px").attr("alignment-baseline","middle")
+
+
+// Features of the annotation
+const annotations = [
+  {
+    note: {
+      label: "Mercedes-Benz vehicles are among the least fuel efficient, in comparison to its compeitor BMW which is more fuel efficient"
+    },
+    x: 150,
+    y: 770,
+    dy: 50,
+    dx: 50
+  },
+  {
+    note: {
+      label: "Jeep Vehicles are mostly on the less fuel efficient side, likely due to the size and weight of them"
+    },
+    x: 250,
+    y: 650,
+    dy: 50,
+    dx: 50
+  },
+  {
+    note: {
+      label: "Surprisingly, BMW vehicles are generally fuel efficient even though BMW is a luxury brand"
+    },
+    x: 400,
+    y: 550,
+    dy: 50,
+    dx: 50
+  },
+  {
+    note: {
+      label: "Fuel efficiency of electric vehicles are high, no matter the brand"
+    },
+    x: 800,
+    y: 250,
+    dy: 50,
+    dx: 50
+  }
+]
+
+// Add annotation to the chart
+const makeAnnotations = d3.annotation()
+  .annotations(annotations)
+d3.select("svg")
+  .append("g")
+  .call(makeAnnotations)
+
+
+
         }
 
+
+           
         </script>
     </body>
 </html>
